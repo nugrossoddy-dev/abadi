@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abadi - Layanan Fotografi Profesional</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #5B23FF;
+            --secondary-color: #7B4FFF;
+            --accent-color: #9B7FFF;
+            --light-bg: #F5F3FF;
+            --dark-text: #2D3748;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            overflow-x: hidden;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .navbar-nav .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        .btn-logout {
+            background-color: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-logout:hover {
+            background-color: var(--accent-color);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        /* Hero Section dengan Background */
+        .hero-section {
+            background: linear-gradient(rgba(91, 35, 255, 0.8), rgba(123, 79, 255, 0.8)), 
+                        url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200&auto=format&fit=crop') center/cover no-repeat;
+            color: white;
+            padding: 6rem 0;
+            margin-top: 56px;
+            position: relative;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease;
+        }
+        
+        /* Card Styles */
+        .service-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(91, 35, 255, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            border: none;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(91, 35, 255, 0.2);
+        }
+        
+        .service-card-img {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .service-card-body {
+            padding: 1.5rem;
+        }
+        
+        .service-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .service-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin: 1rem 0;
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--danger-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            z-index: 10;
+        }
+        
+        /* Button Styles */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(91, 35, 255, 0.3);
+        }
+        
+        .btn-outline-custom {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-custom:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Auth Pages */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 2rem 0;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 450px;
+            width: 100%;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        .auth-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            padding: 0.75rem;
+            border: 2px solid #E2E8F0;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(91, 35, 255, 0.1);
+        }
+        
+        /* Order Status */
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .status-pending {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .status-completed {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .status-cancelled {
+            background-color: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        /* Voucher Section */
+        .voucher-card {
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .voucher-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(91, 35, 255, 0.3);
+        }
+        
+        .voucher-code {
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 2px dashed white;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        
+        /* Gallery */
+        .gallery-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(91, 35, 255, 0.1);
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .auth-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Loading Spinner */
+        .spinner-border-custom {
+            color: var(--primary-color);
+        }
+        
+        /* Modal Custom */
+        .modal-header {
+            border-bottom: 2px solid var(--light-bg);
+        }
+        
+        .modal-footer {
+            border-top: 2px solid var(--light-bg);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar" style="display: none;">
+        <div class="container">
+            <a class="navbar-brand" href="#" onclick="showPage('home')">
+                <i class="fas fa-camera"></i> ABADI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="background-color: white;">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('home')">
+                            <i class="fas fa-home"></i> Beranda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('services')">
+                            <i class="fas fa-camera-retro"></i> Layanan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('orders')">
+                            <i class="fas fa-shopping-cart"></i> Pesanan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('history')">
+                            <i class="fas fa-history"></i> Riwayat
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('profile')">
+                            <i class="fas fa-user"></i> Profile
+                        </a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <button class="btn-logout" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i> Keluar
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="auth-container">
+        <div class="auth-card">
+            <h2 class="auth-title">
+                <i class="fas fa-camera"></i> Login ke Abadi
+            </h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="loginEmail" required placeholder="email@example.com">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="loginPassword" required placeholder="Masukkan password">
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">Ingat Saya</label>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+                    <i class="fas fa-sign-in-alt"></i> Masuk
+                </button>
+                <div class="text-center">
+                    <a href="#" onclick="showForgotPassword()" class="text-decoration-none" style="color: var(--primary-color);">Lupa Password?</a>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <p>Belum punya akun? <a href="#" onclick="showRegister()" class="text-decoration-none" style="color: var(--primary-color); font-weight: 600;">Daftar Sekarang</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="registerPage" class="auth-container hidden">
+        <div class="auth-card">
+            <h2 class="auth-title">
+                <i class="fas fa-user-plus"></i> Daftar Akun
+            </h2>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="mb-3">
+                    <label class="form-label">Nama Lengkap</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" id="registerName" required placeholder="Nama lengkap">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="registerEmail" required placeholder="email@example.com">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="registerPassword" required placeholder="Minimal 6 karakter">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Konfirmasi Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="registerConfirmPassword" required placeholder="Ulangi password">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+                    <i class="fas fa-user-plus"></i> Daftar
+                </button>
+                <div class="text-center">
+                    <p>Sudah punya akun? <a href="#" onclick="showLogin()" class="text-decoration-none" style="color: var(--primary-color); font-weight: 600;">Login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Forgot Password Page -->
+    <div id="forgotPasswordPage" class="auth-container hidden">
+        <div class="auth-card">
+            <h2 class="auth-title">
+                <i class="fas fa-key"></i> Reset Password
+            </h2>
+            <p class="text-center text-muted mb-4">Masukkan email Anda untuk reset password</p>
+            <form id="forgotPasswordForm" onsubmit="handleForgotPassword(event)">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="forgotEmail" required placeholder="email@example.com">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+                    <i class="fas fa-paper-plane"></i> Kirim Link Reset
+                </button>
+                <div class="text-center">
+                    <a href="#" onclick="showLogin()" class="text-decoration-none" style="color: var(--primary-color);">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Login
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="hidden">
+        
+        <!-- Home Page -->
+        <div id="homePage">
+            <!-- Hero Section -->
+            <section class="hero-section" id="heroBackground">
+                <div class="container text-center">
+                    <h1 class="hero-title">Abadikan Momen Berharga Anda</h1>
+                    <p class="hero-subtitle">Layanan fotografi profesional untuk setiap momen spesial dalam hidup Anda</p>
+                    <button class="btn btn-primary-custom btn-lg me-2" onclick="showPage('services')">
+                        <i class="fas fa-camera"></i> Lihat Layanan
+                    </button>
+                    <button class="btn btn-outline-custom btn-lg" style="background: white; color: var(--primary-color);" onclick="showBookingModal()">
+                        <i class="fas fa-shopping-cart"></i> Pesan Sekarang
+                    </button>
+                </div>
+            </section>
+
+            <!-- Voucher Section -->
+            <section class="container my-5">
+                <h2 class="text-center mb-4" style="color: var(--primary-color); font-weight: 700;">
+                    <i class="fas fa-tags"></i> Promo & Voucher Bulan Ini
+                </h2>
+                <div class="row" id="voucherList">
+                    <!-- Vouchers will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Services Preview -->
+            <section class="container my-5">
+                <h2 class="text-center mb-4" style="color: var(--primary-color); font-weight: 700;">
+                    <i class="fas fa-camera-retro"></i> Layanan Kami
+                </h2>
+                <div class="row" id="homeServicesList">
+                    <!-- Services will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Gallery Section -->
+            <section class="container my-5">
+                <h2 class="text-center mb-4" style="color: var(--primary-color); font-weight: 700;">
+                    <i class="fas fa-images"></i> Katalog Foto
+                </h2>
+                <div class="row" id="galleryList">
+                    <!-- Gallery will be loaded here -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Services Page -->
+        <div id="servicesPage" class="hidden" style="margin-top: 80px;">
+            <div class="container my-5">
+                <h2 class="text-center mb-5" style="color: var(--primary-color); font-weight: 700;">
+                    <i class="fas fa-camera-retro"></i> Layanan Fotografi
+                </h2>
+                <div class="row" id="servicesList">
+                    <!-- Services will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Page -->
+        <div id="ordersPage" class="hidden" style="margin-top: 80px;">
+            <div class="container my-5">
+                <h2 class="text-center mb-4" style="color: var(--primary-color); font-weight: 700;">
+                    <i class="fas fa-shopping-cart"></i> Pesanan Saya
+                </h2>
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div id="ordersList">
+                            <!-- Orders will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Page -->
+        <div id="historyPage" class="hidden" style="margin-top: 80px;">
+            <div class="container my-5">
+                <h2 class="text-center mb-4" style="color: var(--primary-color); font-weight: 700;">
+                    <i class="fas fa-history"></i> Riwayat Pemesanan
+                </h2>
+                <div class="row">
+                    <div class="col-lg-10 mx-auto">
+                        <div id="historyList">
+                            <!-- History will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profilePage" class="hidden" style="margin-top: 80px;">
+            <div class="container my-5">
+                <div class="row">
+                    <div class="col-lg-6 mx-auto">
+                        <div class="profile-card">
+                            <div class="profile-avatar" id="profileAvatar">A</div>
+                            <h3 class="text-center mb-4" style="color: var(--primary-color); font-weight: 700;" id="profileName">User Name</h3>
+                            
+                            <form id="profileForm" onsubmit="handleUpdateProfile(event)">
+                                <div class="mb-3">
+                                    <label class="form-label">Nama Lengkap</label>
+                                    <input type="text" class="form-control" id="profileNameInput" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="profileEmailInput" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Nomor Telepon</label>
+                                    <input type="tel" class="form-control" id="profilePhone" placeholder="08xx-xxxx-xxxx">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Alamat</label>
+                                    <textarea class="form-control" id="profileAddress" rows="3" placeholder="Alamat lengkap"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+                                    <i class="fas fa-save"></i> Simpan Perubahan
+                                </button>
+                            </form>
+                            
+                            <hr class="my-4">
+                            
+                            <h5 style="color: var(--primary-color); font-weight: 600;" class="mb-3">Ganti Password</h5>
+                            <form id="changePasswordForm" onsubmit="handleChangePassword(event)">
+                                <div class="mb-3">
+                                    <label class="form-label">Password Lama</label>
+                                    <input type="password" class="form-control" id="oldPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password Baru</label>
+                                    <input type="password" class="form-control" id="newPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Konfirmasi Password Baru</label>
+                                    <input type="password" class="form-control" id="confirmNewPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-outline-custom w-100">
+                                    <i class="fas fa-key"></i> Ganti Password
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel" style="color: var(--primary-color);">
+                        <i class="fas fa-calendar-check"></i> Form Pemesanan
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bookingForm" onsubmit="handleBooking(event)">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Pilih Layanan</label>
+                                <select class="form-select" id="bookingService" required>
+                                    <option value="">-- Pilih Layanan --</option>
+                                    <!-- Options akan diisi oleh JavaScript -->
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tanggal Acara</label>
+                                <input type="date" class="form-control" id="bookingDate" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Nama Lengkap</label>
+                            <input type="text" class="form-control" id="bookingName" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="bookingEmail" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nomor Handphone</label>
+                                <input type="tel" class="form-control" id="bookingPhone" required placeholder="08xx-xxxx-xxxx">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Alamat/Venue Acara</label>
+                            <textarea class="form-control" id="bookingAddress" rows="3" required placeholder="Alamat lengkap tempat acara"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Catatan Tambahan (opsional)</label>
+                            <textarea class="form-control" id="bookingNotes" rows="2" placeholder="Detail tambahan tentang acara"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Metode Pembayaran</label>
+                            <select class="form-select" id="bookingPaymentMethod" required>
+                                <option value="">-- Pilih Metode --</option>
+                                <option value="transfer">Transfer Bank</option>
+                                <option value="cash">Cash (Saat Foto)</option>
+                                <option value="ewallet">E-Wallet (OVO/GoPay/Dana)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            <strong>Informasi Pembayaran:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>DP 50% untuk konfirmasi booking</li>
+                                <li>Pelunasan setelah sesi foto selesai</li>
+                                <li>Konfirmasi pembayaran akan dikirim via WhatsApp/Email</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="fas fa-paper-plane"></i> Ajukan Pemesanan
+                            </button>
+                            <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">
+                                <i class="fas fa-times"></i> Batal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel" style="color: var(--primary-color);">
+                        <i class="fas fa-money-bill-wave"></i> Konfirmasi Pembayaran
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="paymentDetails">
+                        <!-- Detail pembayaran akan diisi oleh JavaScript -->
+                    </div>
+                    <form id="paymentProofForm" onsubmit="handlePaymentProof(event)" class="mt-3">
+                        <div class="mb-3">
+                            <label class="form-label">Upload Bukti Pembayaran</label>
+                            <input type="file" class="form-control" id="paymentProof" accept="image/*,.pdf" required>
+                            <small class="text-muted">Format: JPG, PNG, atau PDF (max 5MB)</small>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="fas fa-upload"></i> Kirim Bukti
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <script>
+        // ============= DATA MANAGEMENT =============
+        
+        // Services Data
+        const servicesData = [
+            {
+                id: 1,
+                name: 'Wedding Photography',
+                description: 'Abadikan momen bahagia pernikahan Anda dengan hasil foto profesional',
+                price: 5000000,
+                discountPrice: 4500000,
+                discount: 10,
+                image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600',
+                packages: [
+                    '6 jam sesi foto',
+                    '300+ foto edit',
+                    '1 album premium',
+                    '2 fotografer profesional'
+                ]
+            },
+            {
+                id: 2,
+                name: 'Birthday Photography',
+                description: 'Rayakan ulang tahun dengan dokumentasi foto yang tak terlupakan',
+                price: 2000000,
+                discountPrice: 1800000,
+                discount: 10,
+                image: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600',
+                packages: [
+                    '3 jam sesi foto',
+                    '150+ foto edit',
+                    'Foto cetak 10R (10 lembar)',
+                    '1 fotografer profesional'
+                ]
+            },
+            {
+                id: 3,
+                name: 'Graduation Photography',
+                description: 'Kenangan kelulusan yang berkesan dengan kualitas foto terbaik',
+                price: 1500000,
+                discountPrice: 1350000,
+                discount: 10,
+                image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600',
+                packages: [
+                    '2 jam sesi foto',
+                    '100+ foto edit',
+                    'Foto cetak 10R (5 lembar)',
+                    '1 fotografer profesional'
+                ]
+            },
+            {
+                id: 4,
+                name: 'Pre-Wedding Photography',
+                description: 'Sesi foto romantis sebelum hari pernikahan Anda',
+                price: 3500000,
+                discountPrice: 3150000,
+                discount: 10,
+                image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600',
+                packages: [
+                    '4 jam sesi foto',
+                    '200+ foto edit',
+                    '1 album mini',
+                    '2 fotografer + videografer'
+                ]
+            },
+            {
+                id: 5,
+                name: 'Family Photography',
+                description: 'Dokumentasi kebersamaan keluarga yang hangat',
+                price: 1800000,
+                discountPrice: 1620000,
+                discount: 10,
+                image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600',
+                packages: [
+                    '2 jam sesi foto',
+                    '120+ foto edit',
+                    'Foto cetak 10R (8 lembar)',
+                    '1 fotografer profesional'
+                ]
+            },
+            {
+                id: 6,
+                name: 'Corporate Event',
+                description: 'Dokumentasi profesional untuk acara perusahaan Anda',
+                price: 4000000,
+                discountPrice: 3600000,
+                discount: 10,
+                image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=600',
+                packages: [
+                    '5 jam sesi foto',
+                    '250+ foto edit',
+                    'Foto digital HD',
+                    '2 fotografer profesional'
+                ]
+            }
+        ];
+
+        // Vouchers Data
+        const vouchersData = [
+            {
+                id: 1,
+                code: 'WEDDING25',
+                discount: 25,
+                description: 'Diskon 25% untuk paket Wedding Photography',
+                validFor: [1],
+                terms: 'Berlaku untuk pemesanan bulan ini'
+            },
+            {
+                id: 2,
+                code: 'BIRTHDAY15',
+                discount: 15,
+                description: 'Diskon 15% untuk paket Birthday Photography',
+                validFor: [2],
+                terms: 'Minimal booking 7 hari sebelum acara'
+            },
+            {
+                id: 3,
+                code: 'GRADUATE20',
+                discount: 20,
+                description: 'Diskon 20% untuk paket Graduation Photography',
+                validFor: [3],
+                terms: 'Khusus mahasiswa dengan menunjukkan KTM'
+            },
+            {
+                id: 4,
+                code: 'ALLSERVICE10',
+                discount: 10,
+                description: 'Diskon 10% untuk semua layanan',
+                validFor: [1, 2, 3, 4, 5, 6],
+                terms: 'Tidak dapat digabung dengan promo lain'
+            }
+        ];
+
+        // Gallery Data
+        const galleryData = [
+            'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=600',
+            'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?w=600',
+            'https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=600',
+            'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=600',
+            'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600',
+            'https://images.unsplash.com/photo-1464983308269-0298fa6afe1a?w=600'
+        ];
+
+        // Background images untuk hero section
+        const heroBackgrounds = [
+            'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=1200&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1200&auto=format&fit=crop'
+        ];
+
+        // ============= AUTHENTICATION =============
+        
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString(36);
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (password.length < 6) {
+                alert('Password minimal 6 karakter!');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Password dan konfirmasi password tidak cocok!');
+                return;
+            }
+            
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            if (users.find(u => u.email === email)) {
+                alert('Email sudah terdaftar!');
+                return;
+            }
+            
+            const newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: simpleHash(password),
+                phone: '',
+                address: '',
+                createdAt: new Date().toISOString()
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            alert('Registrasi berhasil! Silakan login.');
+            showLogin();
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => u.email === email && u.password === simpleHash(password));
+            
+            if (user) {
+                const session = {
+                    userId: user.id,
+                    email: user.email,
+                    name: user.name,
+                    rememberMe: rememberMe,
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(session));
+                
+                animatePageTransition(() => {
+                    document.getElementById('loginPage').classList.add('hidden');
+                    document.getElementById('mainContent').classList.remove('hidden');
+                    document.getElementById('mainNavbar').style.display = 'block';
+                    loadUserData();
+                    showPage('home');
+                });
+            } else {
+                alert('Email atau password salah!');
+            }
+        }
+
+        function handleForgotPassword(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('forgotEmail').value;
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => u.email === email);
+            
+            if (user) {
+                alert(`Link reset password telah dikirim ke ${email}.\n\n(Demo: Dalam aplikasi sesungguhnya, link akan dikirim via email)`);
+                showLogin();
+            } else {
+                alert('Email tidak ditemukan!');
+            }
+        }
+
+        function handleChangePassword(event) {
+            event.preventDefault();
+            
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+            
+            if (newPassword.length < 6) {
+                alert('Password baru minimal 6 karakter!');
+                return;
+            }
+            
+            if (newPassword !== confirmNewPassword) {
+                alert('Password baru dan konfirmasi tidak cocok!');
+                return;
+            }
+            
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            const userIndex = users.findIndex(u => u.id === currentUser.userId);
+            
+            if (userIndex !== -1 && users[userIndex].password === simpleHash(oldPassword)) {
+                users[userIndex].password = simpleHash(newPassword);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                alert('Password berhasil diubah!');
+                document.getElementById('changePasswordForm').reset();
+            } else {
+                alert('Password lama salah!');
+            }
+        }
+
+        function handleUpdateProfile(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('profileNameInput').value;
+            const phone = document.getElementById('profilePhone').value;
+            const address = document.getElementById('profileAddress').value;
+            
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            const userIndex = users.findIndex(u => u.id === currentUser.userId);
+            
+            if (userIndex !== -1) {
+                users[userIndex].name = name;
+                users[userIndex].phone = phone;
+                users[userIndex].address = address;
+                
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                currentUser.name = name;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                alert('Profile berhasil diperbarui!');
+                loadUserData();
+            }
+        }
+
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
+                localStorage.removeItem('currentUser');
+                
+                animatePageTransition(() => {
+                    document.getElementById('mainContent').classList.add('hidden');
+                    document.getElementById('mainNavbar').style.display = 'none';
+                    document.getElementById('loginPage').classList.remove('hidden');
+                });
+            }
+        }
+
+        function checkAuth() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (currentUser && currentUser.rememberMe) {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+                document.getElementById('mainNavbar').style.display = 'block';
+                loadUserData();
+                showPage('home');
+            } else if (currentUser) {
+                const loginTime = new Date(currentUser.loginTime);
+                const now = new Date();
+                const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+                
+                if (hoursDiff < 24) {
+                    document.getElementById('loginPage').classList.add('hidden');
+                    document.getElementById('mainContent').classList.remove('hidden');
+                    document.getElementById('mainNavbar').style.display = 'block';
+                    loadUserData();
+                    showPage('home');
+                } else {
+                    localStorage.removeItem('currentUser');
+                }
+            }
+        }
+
+        function loadUserData() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => u.id === currentUser.userId);
+            
+            if (user) {
+                document.getElementById('profileName').textContent = user.name;
+                document.getElementById('profileAvatar').textContent = user.name.charAt(0).toUpperCase();
+                document.getElementById('profileNameInput').value = user.name;
+                document.getElementById('profileEmailInput').value = user.email;
+                document.getElementById('profilePhone').value = user.phone || '';
+                document.getElementById('profileAddress').value = user.address || '';
+            }
+        }
+
+        // ============= PAGE NAVIGATION =============
+        
+        function showPage(pageName) {
+            const pages = ['homePage', 'servicesPage', 'ordersPage', 'historyPage', 'profilePage'];
+            
+            pages.forEach(page => {
+                document.getElementById(page).classList.add('hidden');
+            });
+            
+            document.getElementById(pageName + 'Page').classList.remove('hidden');
+            
+            if (pageName === 'home') {
+                loadHomeContent();
+            } else if (pageName === 'services') {
+                loadServices();
+            } else if (pageName === 'orders') {
+                loadOrders();
+            } else if (pageName === 'history') {
+                loadHistory();
+            } else if (pageName === 'profile') {
+                loadUserData();
+            }
+            
+            animateContent();
+        }
+
+        function showLogin() {
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('forgotPasswordPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            animateContent();
+        }
+
+        function showRegister() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('forgotPasswordPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.remove('hidden');
+            animateContent();
+        }
+
+        function showForgotPassword() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('forgotPasswordPage').classList.remove('hidden');
+            animateContent();
+        }
+
+        // ============= CONTENT LOADING =============
+        
+        function loadHomeContent() {
+            loadVouchers();
+            loadHomeServices();
+            loadGallery();
+        }
+
+        function loadVouchers() {
+            const voucherList = document.getElementById('voucherList');
+            voucherList.innerHTML = '';
+            
+            vouchersData.forEach(voucher => {
+                const voucherCard = `
+                    <div class="col-md-6 mb-3">
+                        <div class="voucher-card" onclick="applyVoucher('${voucher.code}', ${JSON.stringify(voucher.validFor).replace(/"/g, '&quot;')})">
+                            <h5><i class="fas fa-tag"></i> ${voucher.description}</h5>
+                            <div class="voucher-code">${voucher.code}</div>
+                            <p class="mt-3 mb-0"><small><i class="fas fa-info-circle"></i> ${voucher.terms}</small></p>
+                        </div>
+                    </div>
+                `;
+                voucherList.innerHTML += voucherCard;
+            });
+        }
+
+        function loadHomeServices() {
+            const servicesList = document.getElementById('homeServicesList');
+            servicesList.innerHTML = '';
+            
+            servicesData.slice(0, 3).forEach(service => {
+                const serviceCard = createServiceCard(service);
+                servicesList.innerHTML += serviceCard;
+            });
+        }
+
+        function loadServices() {
+            const servicesList = document.getElementById('servicesList');
+            servicesList.innerHTML = '';
+            
+            servicesData.forEach(service => {
+                const serviceCard = createServiceCard(service);
+                servicesList.innerHTML += serviceCard;
+            });
+        }
+
+        function createServiceCard(service) {
+            return `
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="service-card position-relative">
+                        ${service.discount ? `<span class="discount-badge">-${service.discount}%</span>` : ''}
+                        <img src="${service.image}" alt="${service.name}" class="service-card-img">
+                        <div class="service-card-body">
+                            <h4 class="service-title">${service.name}</h4>
+                            <p class="text-muted">${service.description}</p>
+                            <div class="service-price">
+                                ${service.discount ? `<del class="text-muted" style="font-size: 1rem;">Rp ${service.price.toLocaleString('id-ID')}</del><br>` : ''}
+                                Rp ${service.discountPrice.toLocaleString('id-ID')}
+                            </div>
+                            <div class="mb-3">
+                                <strong>Paket Termasuk:</strong>
+                                <ul class="mt-2">
+                                    ${service.packages.map(pkg => `<li>${pkg}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <button class="btn btn-primary-custom w-100" onclick="bookService(${service.id})">
+                                <i class="fas fa-shopping-cart"></i> Pesan Sekarang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadGallery() {
+            const galleryList = document.getElementById('galleryList');
+            galleryList.innerHTML = '';
+            
+            galleryData.forEach((image, index) => {
+                const galleryItem = `
+                    <div class="col-md-4 mb-4">
+                        <img src="${image}" alt="Gallery ${index + 1}" class="gallery-img">
+                    </div>
+                `;
+                galleryList.innerHTML += galleryItem;
+            });
+        }
+
+        // ============= BOOKING & ORDERS =============
+        
+        let appliedVoucher = null;
+        let selectedServiceForBooking = null;
+
+        function applyVoucher(code, validFor) {
+            appliedVoucher = vouchersData.find(v => v.code === code);
+            alert(`Voucher ${code} berhasil diterapkan!\n\nSilakan pilih layanan yang tersedia untuk voucher ini.`);
+            showPage('services');
+        }
+
+        function showBookingModal(serviceId = null) {
+            selectedServiceForBooking = serviceId;
+            const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+            
+            // Isi dropdown layanan
+            const serviceSelect = document.getElementById('bookingService');
+            serviceSelect.innerHTML = '<option value="">-- Pilih Layanan --</option>';
+            
+            servicesData.forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.id;
+                option.textContent = `${service.name} - Rp ${service.discountPrice.toLocaleString('id-ID')}`;
+                if (serviceId === service.id) {
+                    option.selected = true;
+                }
+                serviceSelect.appendChild(option);
+            });
+            
+            // Set tanggal minimal hari ini
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('bookingDate').min = today;
+            
+            // Isi data user jika sudah login
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const user = users.find(u => u.id === currentUser.userId);
+                if (user) {
+                    document.getElementById('bookingName').value = user.name;
+                    document.getElementById('bookingEmail').value = user.email;
+                    document.getElementById('bookingPhone').value = user.phone || '';
+                    document.getElementById('bookingAddress').value = user.address || '';
+                }
+            }
+            
+            bookingModal.show();
+        }
+
+        function handleBooking(event) {
+            event.preventDefault();
+            
+            const serviceId = parseInt(document.getElementById('bookingService').value);
+            const service = servicesData.find(s => s.id === serviceId);
+            
+            if (!service) {
+                alert('Silakan pilih layanan terlebih dahulu!');
+                return;
+            }
+            
+            const bookingData = {
+                id: Date.now(),
+                serviceId: serviceId,
+                serviceName: service.name,
+                date: document.getElementById('bookingDate').value,
+                customerName: document.getElementById('bookingName').value,
+                customerEmail: document.getElementById('bookingEmail').value,
+                customerPhone: document.getElementById('bookingPhone').value,
+                address: document.getElementById('bookingAddress').value,
+                notes: document.getElementById('bookingNotes').value,
+                paymentMethod: document.getElementById('bookingPaymentMethod').value,
+                originalPrice: service.discountPrice,
+                finalPrice: service.discountPrice,
+                voucherUsed: null,
+                status: 'pending',
+                paymentStatus: 'unpaid',
+                createdAt: new Date().toISOString(),
+                photoSessionDone: false,
+                paid: false
+            };
+            
+            // Cek voucher yang diterapkan
+            let finalPrice = service.discountPrice;
+            if (appliedVoucher && appliedVoucher.validFor.includes(serviceId)) {
+                const voucherDiscount = (finalPrice * appliedVoucher.discount) / 100;
+                finalPrice = finalPrice - voucherDiscount;
+                bookingData.voucherUsed = appliedVoucher.code;
+                bookingData.finalPrice = finalPrice;
+                alert(`Voucher ${appliedVoucher.code} berhasil diterapkan!\nDiskon: Rp ${voucherDiscount.toLocaleString('id-ID')}`);
+                appliedVoucher = null;
+            }
+            
+            // Simpan booking
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            bookings.push(bookingData);
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+            
+            // Tampilkan modal pembayaran
+            document.getElementById('bookingModal').querySelector('.btn-close').click();
+            showPaymentModal(bookingData);
+        }
+
+        function showPaymentModal(bookingData) {
+            const paymentDetails = document.getElementById('paymentDetails');
+            
+            let paymentInfo = '';
+            switch(bookingData.paymentMethod) {
+                case 'transfer':
+                    paymentInfo = `
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-university"></i> Transfer Bank</h6>
+                            <p class="mb-1"><strong>Bank BCA</strong></p>
+                            <p class="mb-1">No. Rekening: 123-456-7890</p>
+                            <p class="mb-1">Atas Nama: PT Abadi Fotografi</p>
+                            <p class="mb-0"><strong>DP 50%: Rp ${(bookingData.finalPrice * 0.5).toLocaleString('id-ID')}</strong></p>
+                        </div>
+                    `;
+                    break;
+                case 'ewallet':
+                    paymentInfo = `
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-mobile-alt"></i> E-Wallet</h6>
+                            <p class="mb-1"><strong>OVO/GoPay/Dana</strong></p>
+                            <p class="mb-1">Nomor: 0812-3456-7890</p>
+                            <p class="mb-1">Atas Nama: Abadi Fotografi</p>
+                            <p class="mb-0"><strong>DP 50%: Rp ${(bookingData.finalPrice * 0.5).toLocaleString('id-ID')}</strong></p>
+                        </div>
+                    `;
+                    break;
+                case 'cash':
+                    paymentInfo = `
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-money-bill"></i> Cash</h6>
+                            <p>Pembayaran dilakukan saat sesi foto dimulai</p>
+                            <p class="mb-0"><strong>Total: Rp ${bookingData.finalPrice.toLocaleString('id-ID')}</strong></p>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            paymentDetails.innerHTML = `
+                <div class="mb-3">
+                    <h6>Detail Pesanan</h6>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Layanan</td>
+                            <td>${bookingData.serviceName}</td>
+                        </tr>
+                        <tr>
+                            <td>Tanggal</td>
+                            <td>${new Date(bookingData.date).toLocaleDateString('id-ID')}</td>
+                        </tr>
+                        <tr>
+                            <td>Total</td>
+                            <td><strong>Rp ${bookingData.finalPrice.toLocaleString('id-ID')}</strong></td>
+                        </tr>
+                    </table>
+                </div>
+                ${paymentInfo}
+                <p class="text-muted"><small>Upload bukti pembayaran untuk konfirmasi booking</small></p>
+            `;
+            
+            // Simpan booking ID untuk pembayaran
+            paymentDetails.dataset.bookingId = bookingData.id;
+            
+            const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+            paymentModal.show();
+        }
+
+        function handlePaymentProof(event) {
+            event.preventDefault();
+            
+            const fileInput = document.getElementById('paymentProof');
+            const bookingId = document.getElementById('paymentDetails').dataset.bookingId;
+            
+            if (fileInput.files.length === 0) {
+                alert('Silakan pilih file bukti pembayaran!');
+                return;
+            }
+            
+            // Dalam aplikasi nyata, file akan diupload ke server
+            // Untuk demo, kita simpan informasi saja
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            const bookingIndex = bookings.findIndex(b => b.id === parseInt(bookingId));
+            
+            if (bookingIndex !== -1) {
+                bookings[bookingIndex].paymentProofUploaded = true;
+                bookings[bookingIndex].paymentProofDate = new Date().toISOString();
+                bookings[bookingIndex].paymentStatus = 'waiting_verification';
+                
+                // Juga simpan sebagai order untuk ditampilkan di halaman orders
+                const booking = bookings[bookingIndex];
+                
+                let orders = JSON.parse(localStorage.getItem('orders')) || [];
+                const order = {
+                    id: booking.id,
+                    userId: JSON.parse(localStorage.getItem('currentUser')).userId,
+                    serviceId: booking.serviceId,
+                    serviceName: booking.serviceName,
+                    price: booking.finalPrice,
+                    originalPrice: booking.originalPrice,
+                    voucherUsed: booking.voucherUsed,
+                    status: 'pending',
+                    orderDate: booking.createdAt,
+                    bookingDate: booking.date,
+                    customerPhone: booking.customerPhone,
+                    customerEmail: booking.customerEmail,
+                    address: booking.address,
+                    paymentMethod: booking.paymentMethod,
+                    paymentStatus: booking.paymentStatus,
+                    photoSessionDone: false,
+                    paid: false
+                };
+                
+                orders.push(order);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+                
+                document.getElementById('paymentModal').querySelector('.btn-close').click();
+                alert('Bukti pembayaran berhasil dikirim! Admin akan memverifikasi dalam 1x24 jam.\nBooking ID: ' + bookingId);
+                showPage('orders');
+            }
+        }
+
+        function bookService(serviceId) {
+            showBookingModal(serviceId);
+        }
+
+        function loadOrders() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const userOrders = orders.filter(o => o.userId === currentUser.userId && o.status === 'pending');
+            
+            const ordersList = document.getElementById('ordersList');
+            
+            if (userOrders.length === 0) {
+                ordersList.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-cart" style="font-size: 4rem; color: var(--accent-color);"></i>
+                        <h4 class="mt-3" style="color: var(--primary-color);">Belum ada pesanan</h4>
+                        <p class="text-muted">Silakan pesan layanan fotografi kami</p>
+                        <button class="btn btn-primary-custom" onclick="showPage('services')">
+                            <i class="fas fa-camera"></i> Lihat Layanan
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            ordersList.innerHTML = '';
+            
+            userOrders.forEach(order => {
+                const orderCard = `
+                    <div class="card service-card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="service-title mb-2">${order.serviceName}</h5>
+                                    <span class="status-badge status-pending">
+                                        <i class="fas fa-clock"></i> Belum Selesai
+                                    </span>
+                                </div>
+                                <div class="text-end">
+                                    <div class="service-price mb-0">Rp ${order.price.toLocaleString('id-ID')}</div>
+                                    ${order.voucherUsed ? `<small class="text-success"><i class="fas fa-tag"></i> ${order.voucherUsed}</small>` : ''}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar"></i> 
+                                        Tanggal Acara: ${order.bookingDate ? new Date(order.bookingDate).toLocaleDateString('id-ID') : '-'}
+                                    </small>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt"></i> 
+                                        Lokasi: ${order.address || '-'}
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="alert ${order.paymentStatus === 'waiting_verification' ? 'alert-info' : 'alert-warning'}">
+                                <strong><i class="fas ${order.paymentStatus === 'waiting_verification' ? 'fa-hourglass-half' : 'fa-exclamation-triangle'}"></i> Status:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>${order.photoSessionDone ? '✓' : '✗'} Sesi foto ${order.photoSessionDone ? 'selesai' : 'belum dilakukan'}</li>
+                                    <li>${order.paid ? '✓' : '✗'} Pembayaran ${order.paid ? 'lunas' : order.paymentStatus === 'waiting_verification' ? 'menunggu verifikasi' : 'belum dibayar'}</li>
+                                    ${order.customerPhone ? `<li><i class="fas fa-phone"></i> Kontak: ${order.customerPhone}</li>` : ''}
+                                    <li><i class="fas fa-credit-card"></i> Metode: ${order.paymentMethod || '-'}</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                ${!order.photoSessionDone ? `
+                                    <button class="btn btn-primary-custom flex-fill" onclick="markSessionDone(${order.id})">
+                                        <i class="fas fa-camera"></i> Sesi Foto Selesai
+                                    </button>
+                                ` : ''}
+                                ${!order.paid && order.paymentMethod !== 'cash' && order.paymentStatus !== 'waiting_verification' ? `
+                                    <button class="btn btn-primary-custom flex-fill" onclick="showPaymentModalForOrder(${order.id})">
+                                        <i class="fas fa-money-bill"></i> Bayar Sekarang
+                                    </button>
+                                ` : ''}
+                                <button class="btn btn-outline-custom" onclick="deleteOrder(${order.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                ordersList.innerHTML += orderCard;
+            });
+        }
+
+        function showPaymentModalForOrder(orderId) {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const order = orders.find(o => o.id === orderId);
+            
+            if (order) {
+                const bookingData = {
+                    id: order.id,
+                    serviceName: order.serviceName,
+                    finalPrice: order.price,
+                    paymentMethod: order.paymentMethod,
+                    date: order.bookingDate
+                };
+                
+                showPaymentModal(bookingData);
+            }
+        }
+
+        function markSessionDone(orderId) {
+            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            
+            if (orderIndex !== -1) {
+                orders[orderIndex].photoSessionDone = true;
+                
+                if (orders[orderIndex].photoSessionDone && orders[orderIndex].paid) {
+                    orders[orderIndex].status = 'completed';
+                    orders[orderIndex].completedDate = new Date().toISOString();
+                }
+                
+                localStorage.setItem('orders', JSON.stringify(orders));
+                alert('Sesi foto ditandai selesai!');
+                loadOrders();
+            }
+        }
+
+        function markPaid(orderId) {
+            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            
+            if (orderIndex !== -1) {
+                orders[orderIndex].paid = true;
+                orders[orderIndex].paymentStatus = 'paid';
+                
+                if (orders[orderIndex].photoSessionDone && orders[orderIndex].paid) {
+                    orders[orderIndex].status = 'completed';
+                    orders[orderIndex].completedDate = new Date().toISOString();
+                }
+                
+                localStorage.setItem('orders', JSON.stringify(orders));
+                alert('Pembayaran berhasil!');
+                loadOrders();
+            }
+        }
+
+        function deleteOrder(orderId) {
+            if (confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) {
+                let orders = JSON.parse(localStorage.getItem('orders')) || [];
+                orders = orders.filter(o => o.id !== orderId);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                alert('Pesanan berhasil dihapus!');
+                loadOrders();
+            }
+        }
+
+        function loadHistory() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const completedOrders = orders.filter(o => o.userId === currentUser.userId && o.status === 'completed');
+            
+            const historyList = document.getElementById('historyList');
+            
+            if (completedOrders.length === 0) {
+                historyList.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-history" style="font-size: 4rem; color: var(--accent-color);"></i>
+                        <h4 class="mt-3" style="color: var(--primary-color);">Belum ada riwayat</h4>
+                        <p class="text-muted">Riwayat pemesanan yang sudah selesai akan muncul di sini</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            
+            completedOrders.reverse().forEach(order => {
+                const historyCard = `
+                    <div class="card service-card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="service-title mb-2">${order.serviceName}</h5>
+                                    <span class="status-badge status-completed">
+                                        <i class="fas fa-check-circle"></i> Selesai
+                                    </span>
+                                </div>
+                                <div class="text-end">
+                                    <div class="service-price mb-0">Rp ${order.price.toLocaleString('id-ID')}</div>
+                                    ${order.voucherUsed ? `<small class="text-success"><i class="fas fa-tag"></i> ${order.voucherUsed}</small>` : ''}
+                                </div>
+                            </div>
+                            
+                            <div class="row text-muted">
+                                <div class="col-6">
+                                    <small>
+                                        <i class="fas fa-calendar"></i> 
+                                        Dipesan: ${new Date(order.orderDate).toLocaleDateString('id-ID')}
+                                    </small>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <small>
+                                        <i class="fas fa-check"></i> 
+                                        Selesai: ${new Date(order.completedDate).toLocaleDateString('id-ID')}
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-success mt-3 mb-0">
+                                <i class="fas fa-check-circle"></i> 
+                                <strong>Pesanan Selesai</strong>
+                                <p class="mb-0 mt-1"><small>Terima kasih telah menggunakan layanan kami!</small></p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                historyList.innerHTML += historyCard;
+            });
+        }
+
+        // ============= HERO BACKGROUND FUNCTION =============
+        
+        function changeHeroBackground() {
+            const randomIndex = Math.floor(Math.random() * heroBackgrounds.length);
+            const heroSection = document.getElementById('heroBackground');
+            heroSection.style.backgroundImage = `linear-gradient(rgba(91, 35, 255, 0.8), rgba(123, 79, 255, 0.8)), url('${heroBackgrounds[randomIndex]}')`;
+        }
+
+        // ============= ANIMATIONS =============
+        
+        function animateContent() {
+            anime({
+                targets: '.auth-card, .service-card, .voucher-card, .profile-card',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                delay: anime.stagger(100),
+                duration: 600,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        function animatePageTransition(callback) {
+            anime({
+                targets: 'body',
+                opacity: [1, 0],
+                duration: 300,
+                easing: 'easeInQuad',
+                complete: () => {
+                    callback();
+                    anime({
+                        targets: 'body',
+                        opacity: [0, 1],
+                        duration: 300,
+                        easing: 'easeOutQuad'
+                    });
+                }
+            });
+        }
+
+        // ============= INITIALIZATION =============
+        
+        window.onload = function() {
+            checkAuth();
+            changeHeroBackground();
+            
+            anime({
+                targets: '.hero-section',
+                opacity: [0, 1],
+                translateY: [-50, 0],
+                duration: 1000,
+                easing: 'easeOutQuad'
+            });
+        };
+    </script>
+</body>
+</html>
