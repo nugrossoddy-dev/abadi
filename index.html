@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner - AI Prompt Manager</title>
+    
+    <!-- PWA Metadata -->
+    <meta name="theme-color" content="#4a6ee0">
+    <meta name="description" content="Aplikasi manajemen prompt AI untuk konten kreator">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- Highlight.js untuk syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #4a6ee0;
+            --primary-dark: #3a5ad0;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --bg-light: #ffffff;
+            --bg-dark: #1a1d28;
+            --text-light: #212529;
+            --text-dark: #f8f9fa;
+            --border-light: #dee2e6;
+            --border-dark: #495057;
+            --card-bg-light: #ffffff;
+            --card-bg-dark: #2d3246;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: var(--bg-dark);
+            --text-color: var(--text-dark);
+            --border-color: var(--border-dark);
+            --card-bg: var(--card-bg-dark);
+        }
+        
+        [data-theme="light"] {
+            --bg-color: var(--bg-light);
+            --text-color: var(--text-light);
+            --border-color: var(--border-light);
+            --card-bg: var(--card-bg-light);
+        }
+        
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+        
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary) !important;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: calc(100vh - 56px);
+            top: 56px;
+            left: 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+        
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .main-content.expanded {
+            margin-left: 0;
+        }
+        
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .form-control, .form-select {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(74, 110, 224, 0.25);
+        }
+        
+        .prompt-editor {
+            min-height: 300px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
+        
+        .prompt-editor:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(74, 110, 224, 0.25);
+        }
+        
+        .variable-highlight {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+        
+        .prompt-card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .prompt-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        .category-badge {
+            font-size: 0.75rem;
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+        }
+        
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 992px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .variable-input {
+            margin-bottom: 10px;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding-top: 60px;
+        }
+        
+        .auth-card {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1040;
+            display: none;
+        }
+        
+        .backdrop.show {
+            display: block;
+        }
+        
+        .tab-content {
+            padding: 20px 0;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--text-color);
+            border: none;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 56px);
+            background-color: rgba(0,0,0,0.5);
+            z-index: 99;
+            display: none;
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .loading-spinner {
+            display: none;
+        }
+        
+        .loading-spinner.active {
+            display: block;
+        }
+        
+        .tab-pane {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(74, 110, 224, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(74, 110, 224, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(74, 110, 224, 0); }
+        }
+        
+        footer {
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+        
+        .token-count {
+            font-size: 0.875rem;
+            color: var(--secondary);
+        }
+        
+        .syntax-highlight {
+            border-radius: 4px;
+            padding: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <!-- Toast Notifications -->
+    <div class="toast-container"></div>
+    
+    <!-- Backdrop for modals -->
+    <div class="backdrop"></div>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay"></div>
+    
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background-color: var(--card-bg);">
+        <div class="container-fluid">
+            <button class="btn btn-outline-secondary me-2 d-lg-none" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-lightbulb me-2"></i>Planner
+            </a>
+            
+            <div class="d-flex align-items-center">
+                <!-- Theme Toggle -->
+                <button class="btn btn-outline-secondary me-2" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                
+                <!-- User Menu -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" id="userMenu" data-bs-toggle="dropdown">
+                        <div class="user-avatar me-2" id="userAvatar">U</div>
+                        <span id="userName">User</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3">
+            <div class="mb-4">
+                <button class="btn btn-primary w-100 mb-2" id="newPromptBtn">
+                    <i class="fas fa-plus me-2"></i>New Prompt
+                </button>
+                <button class="btn btn-outline-primary w-100" id="importBtn">
+                    <i class="fas fa-file-import me-2"></i>Import
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <h6 class="text-uppercase text-muted mb-2">Menu</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#library">
+                            <i class="fas fa-book me-2"></i>Prompt Library
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#templates">
+                            <i class="fas fa-layer-group me-2"></i>Templates
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#variables">
+                            <i class="fas fa-tags me-2"></i>Variables
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#testing">
+                            <i class="fas fa-vial me-2"></i>Testing
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="mb-4">
+                <h6 class="text-uppercase text-muted mb-2">Categories</h6>
+                <div class="d-flex flex-wrap gap-1">
+                    <button class="btn btn-sm btn-outline-primary category-filter" data-category="all">All</button>
+                    <button class="btn btn-sm btn-outline-primary category-filter" data-category="marketing">Marketing</button>
+                    <button class="btn btn-sm btn-outline-primary category-filter" data-category="creative">Creative</button>
+                    <button class="btn btn-sm btn-outline-primary category-filter" data-category="image">Image</button>
+                    <button class="btn btn-sm btn-outline-primary category-filter" data-category="code">Code</button>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <h6 class="text-uppercase text-muted mb-2">Quick Stats</h6>
+                <div class="stat-card">
+                    <p class="mb-1">Total Prompts: <span id="totalPrompts">0</span></p>
+                    <p class="mb-1">Templates: <span id="totalTemplates">0</span></p>
+                    <p class="mb-0">Variables: <span id="totalVariables">0</span></p>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button class="btn btn-outline-secondary w-100 mb-2" id="exportBtn">
+                    <i class="fas fa-file-export me-2"></i>Export Data
+                </button>
+                <button class="btn btn-outline-danger w-100" id="clearDataBtn">
+                    <i class="fas fa-trash me-2"></i>Clear Data
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="page-container">
+            <!-- Dashboard -->
+            <div id="dashboard" class="page-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Dashboard</h2>
+                    <div class="d-flex">
+                        <input type="text" class="form-control me-2" placeholder="Search prompts..." id="searchInput">
+                        <button class="btn btn-outline-primary" id="searchBtn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="text-primary mb-1">Recent Prompts</h5>
+                                    <h3 id="recentPromptsCount">0</h3>
+                                </div>
+                                <i class="fas fa-clock fa-2x text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="text-success mb-1">Favorites</h5>
+                                    <h3 id="favoritesCount">0</h3>
+                                </div>
+                                <i class="fas fa-star fa-2x text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="text-info mb-1">Templates</h5>
+                                    <h3 id="dashboardTemplatesCount">0</h3>
+                                </div>
+                                <i class="fas fa-layer-group fa-2x text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="text-warning mb-1">Tokens Used</h5>
+                                    <h3 id="tokensUsed">0</h3>
+                                </div>
+                                <i class="fas fa-brain fa-2x text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Recent Prompts</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="recentPromptsList" class="template-grid">
+                                    <!-- Recent prompts will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Quick Actions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary" id="quickNewPrompt">
+                                        <i class="fas fa-plus me-2"></i>Create New Prompt
+                                    </button>
+                                    <button class="btn btn-outline-primary" id="quickTestPrompt">
+                                        <i class="fas fa-vial me-2"></i>Test a Prompt
+                                    </button>
+                                    <button class="btn btn-outline-primary" id="quickVariables">
+                                        <i class="fas fa-tags me-2"></i>Manage Variables
+                                    </button>
+                                    <button class="btn btn-outline-primary" id="quickTemplates">
+                                        <i class="fas fa-layer-group me-2"></i>Browse Templates
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Categories</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="categoryStats">
+                                    <!-- Category stats will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prompt Editor -->
+            <div id="editor" class="page-content" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 id="editorTitle">New Prompt</h2>
+                    <div>
+                        <button class="btn btn-outline-secondary me-2" id="cancelEditBtn">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                        <button class="btn btn-primary" id="savePromptBtn">
+                            <i class="fas fa-save me-2"></i>Save Prompt
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="promptTitle" class="form-label">Prompt Title</label>
+                            <input type="text" class="form-control" id="promptTitle" placeholder="Enter a descriptive title">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="promptCategory" class="form-label">Category</label>
+                            <select class="form-select" id="promptCategory">
+                                <option value="marketing">Marketing</option>
+                                <option value="creative">Creative Writing</option>
+                                <option value="image">Image Generation</option>
+                                <option value="code">Code</option>
+                                <option value="video">Video Script</option>
+                                <option value="social">Social Media</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="promptTags" class="form-label">Tags (comma separated)</label>
+                            <input type="text" class="form-control" id="promptTags" placeholder="e.g., blog, seo, product">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check form-switch mt-4">
+                            <input class="form-check-input" type="checkbox" id="promptFavorite">
+                            <label class="form-check-label" for="promptFavorite">Mark as Favorite</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="editor-container mb-4">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label">Prompt Editor</label>
+                            <div>
+                                <span class="me-3 token-count">Chars: <span id="charCount">0</span></span>
+                                <span class="token-count">Tokens: ~<span id="tokenCount">0</span></span>
+                            </div>
+                        </div>
+                        <div class="prompt-editor" id="promptEditor" contenteditable="true" placeholder="Type your prompt here... Use {{variable_name}} for variables."></div>
+                        
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-outline-primary me-2" id="addVariableBtn">
+                                <i class="fas fa-plus me-1"></i>Add Variable
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" id="previewPromptBtn">
+                                <i class="fas fa-eye me-1"></i>Preview
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label">Variables</label>
+                            <button class="btn btn-sm btn-outline-primary" id="bulkFillBtn">
+                                <i class="fas fa-fill-drip me-1"></i>Bulk Fill
+                            </button>
+                        </div>
+                        <div id="variablesContainer">
+                            <!-- Variable inputs will be added here -->
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Add variables using {{variable_name}} syntax in the editor above.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Preview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="syntax-highlight" id="promptPreview">
+                            <!-- Preview will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prompt Library -->
+            <div id="library" class="page-content" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Prompt Library</h2>
+                    <div class="d-flex">
+                        <select class="form-select me-2" id="librarySort">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="name">Name A-Z</option>
+                            <option value="category">Category</option>
+                        </select>
+                        <button class="btn btn-outline-primary" id="filterFavoritesBtn">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="promptsGrid" class="template-grid">
+                    <!-- Prompts will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Templates -->
+            <div id="templates" class="page-content" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Templates</h2>
+                    <button class="btn btn-primary" id="newTemplateBtn">
+                        <i class="fas fa-plus me-2"></i>New Template
+                    </button>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card prompt-card" data-template="marketing">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title">Marketing Copy</h5>
+                                        <p class="card-text small">Generate marketing copy for products</p>
+                                    </div>
+                                    <span class="badge bg-primary">Marketing</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card prompt-card" data-template="creative">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title">Creative Story</h5>
+                                        <p class="card-text small">Generate creative writing prompts</p>
+                                    </div>
+                                    <span class="badge bg-success">Creative</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card prompt-card" data-template="image">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title">Image Prompt</h5>
+                                        <p class="card-text small">Generate prompts for AI image generation</p>
+                                    </div>
+                                    <span class="badge bg-warning">Image</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card prompt-card" data-template="code">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title">Code Assistant</h5>
+                                        <p class="card-text small">Generate and explain code snippets</p>
+                                    </div>
+                                    <span class="badge bg-info">Code</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Saved Templates</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="savedTemplatesList" class="template-grid">
+                            <!-- Saved templates will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Variables -->
+            <div id="variables" class="page-content" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Variables</h2>
+                    <button class="btn btn-primary" id="newVariableSetBtn">
+                        <i class="fas fa-plus me-2"></i>New Variable Set
+                    </button>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div id="variablesList">
+                            <!-- Variables will be loaded here -->
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Variables allow you to create reusable templates. Create a variable set to use across multiple prompts.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Testing -->
+            <div id="testing" class="page-content" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Prompt Testing</h2>
+                    <button class="btn btn-primary" id="testPromptBtn">
+                        <i class="fas fa-play me-2"></i>Test Prompt
+                    </button>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Test Configuration</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="testPromptSelect" class="form-label">Select Prompt</label>
+                                    <select class="form-select" id="testPromptSelect">
+                                        <option value="">Select a prompt to test</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">AI Service</label>
+                                    <select class="form-select" id="aiServiceSelect">
+                                        <option value="openai">OpenAI</option>
+                                        <option value="anthropic">Anthropic</option>
+                                        <option value="google">Google AI</option>
+                                        <option value="local">Local Model</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="apiKey" class="form-label">API Key</label>
+                                    <input type="password" class="form-control" id="apiKey" placeholder="Enter your API key">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="temperature" class="form-label">Temperature: <span id="tempValue">0.7</span></label>
+                                    <input type="range" class="form-range" id="temperature" min="0" max="1" step="0.1" value="0.7">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Test Results</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="testResults">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Select a prompt and configure the AI service to test it. Results will appear here.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profile Page -->
+            <div id="profile" class="page-content" style="display: none;">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="mb-0">Profile Settings</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-4">
+                                    <div class="user-avatar mx-auto mb-3" id="profileAvatar" style="width: 80px; height: 80px; font-size: 2rem;">U</div>
+                                    <h4 id="profileName">User Name</h4>
+                                    <p id="profileEmail" class="text-muted">user@example.com</p>
+                                </div>
+                                
+                                <form id="profileForm">
+                                    <div class="mb-3">
+                                        <label for="editName" class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" id="editName">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="editEmail" class="form-label">Email Address</label>
+                                        <input type="email" class="form-control" id="editEmail">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="currentPassword" class="form-label">Current Password</label>
+                                        <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password to make changes">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="newPassword" class="form-label">New Password</label>
+                                        <input type="password" class="form-control" id="newPassword" placeholder="Leave blank to keep current">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                        <input type="password" class="form-control" id="confirmPassword">
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-outline-secondary" id="cancelProfileBtn">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Auth Pages -->
+            <div id="auth" class="page-content">
+                <div class="login-container">
+                    <div class="auth-card card shadow">
+                        <div class="card-header bg-primary text-white text-center py-4">
+                            <h2><i class="fas fa-lightbulb me-2"></i>Planner</h2>
+                            <p class="mb-0">AI Prompt Manager for Creators</p>
+                        </div>
+                        
+                        <div class="card-body p-4">
+                            <ul class="nav nav-tabs" id="authTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button">Login</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button">Register</button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content mt-4">
+                                <!-- Login Form -->
+                                <div class="tab-pane fade show active" id="login" role="tabpanel">
+                                    <form id="loginForm">
+                                        <div class="mb-3">
+                                            <label for="loginEmail" class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" id="loginEmail" required>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="loginPassword" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="loginPassword" required>
+                                        </div>
+                                        
+                                        <div class="mb-3 form-check">
+                                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                                        </div>
+                                        
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-primary">Login</button>
+                                            <button type="button" class="btn btn-link" id="forgotPasswordBtn">Forgot Password?</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Register Form -->
+                                <div class="tab-pane fade" id="register" role="tabpanel">
+                                    <form id="registerForm">
+                                        <div class="mb-3">
+                                            <label for="registerName" class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" id="registerName" required>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="registerEmail" class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" id="registerEmail" required>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="registerPassword" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="registerPassword" required>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="registerConfirmPassword" class="form-label">Confirm Password</label>
+                                            <input type="password" class="form-control" id="registerConfirmPassword" required>
+                                        </div>
+                                        
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary">Register</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="mt-5 py-3 text-center">
+            <div class="container">
+                <p class="mb-0">Planner - AI Prompt Manager &copy; 2023</p>
+                <p class="text-muted small mb-0">PWA | Works Offline | Local Storage</p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background-color: rgba(0,0,0,0.5); z-index: 1100;">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal fade" id="variableModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Variable</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="variableName" class="form-label">Variable Name</label>
+                        <input type="text" class="form-control" id="variableName" placeholder="e.g., topic, tone, length">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="variableDescription" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="variableDescription" placeholder="Describe what this variable is for">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="variableValues" class="form-label">Default Values (one per line)</label>
+                        <textarea class="form-control" id="variableValues" rows="4" placeholder="Enter default values, one per line"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveVariableBtn">Save Variable</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="exportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Export Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Export Options</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportPrompts" checked>
+                            <label class="form-check-label" for="exportPrompts">Prompts</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportTemplates" checked>
+                            <label class="form-check-label" for="exportTemplates">Templates</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportVariables" checked>
+                            <label class="form-check-label" for="exportVariables">Variables</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportSettings">
+                            <label class="form-check-label" for="exportSettings">Settings</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmExportBtn">Export Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Application State
+        const AppState = {
+            currentUser: null,
+            currentPage: 'auth',
+            prompts: [],
+            templates: [],
+            variables: [],
+            categories: ['marketing', 'creative', 'image', 'code', 'video', 'social', 'other'],
+            editingPrompt: null,
+            currentTheme: 'light',
+            isLoggedIn: false
+        };
+        
+        // Simple hash function for passwords (for demo purposes only)
+        function simpleHash(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString(16);
+        }
+        
+        // User Authentication Functions
+        function initializeAuth() {
+            // Check if user is already logged in
+            const session = localStorage.getItem('planner_session');
+            const users = JSON.parse(localStorage.getItem('planner_users') || '[]');
+            
+            if (session) {
+                const sessionData = JSON.parse(session);
+                const user = users.find(u => u.email === sessionData.email && u.password === sessionData.password);
+                
+                if (user) {
+                    AppState.currentUser = user;
+                    AppState.isLoggedIn = true;
+                    showPage('dashboard');
+                    updateUserUI();
+                    loadUserData();
+                    return;
+                }
+            }
+            
+            // Show auth page if not logged in
+            showPage('auth');
+        }
+        
+        function registerUser(name, email, password) {
+            const users = JSON.parse(localStorage.getItem('planner_users') || '[]');
+            
+            // Check if user already exists
+            if (users.find(u => u.email === email)) {
+                return { success: false, message: 'User with this email already exists' };
+            }
+            
+            // Hash password
+            const hashedPassword = simpleHash(password);
+            
+            // Create user object
+            const newUser = {
+                id: Date.now().toString(),
+                name,
+                email,
+                password: hashedPassword,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Save user
+            users.push(newUser);
+            localStorage.setItem('planner_users', JSON.stringify(users));
+            
+            // Auto-login
+            loginUser(email, password, true);
+            
+            return { success: true };
+        }
+        
+        function loginUser(email, password, remember = false) {
+            const users = JSON.parse(localStorage.getItem('planner_users') || '[]');
+            const hashedPassword = simpleHash(password);
+            const user = users.find(u => u.email === email && u.password === hashedPassword);
+            
+            if (!user) {
+                return { success: false, message: 'Invalid email or password' };
+            }
+            
+            AppState.currentUser = user;
+            AppState.isLoggedIn = true;
+            
+            // Save session if remember me is checked
+            if (remember) {
+                const sessionData = {
+                    email: user.email,
+                    password: user.password,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('planner_session', JSON.stringify(sessionData));
+            }
+            
+            showPage('dashboard');
+            updateUserUI();
+            loadUserData();
+            
+            return { success: true };
+        }
+        
+        function logoutUser() {
+            AppState.currentUser = null;
+            AppState.isLoggedIn = false;
+            localStorage.removeItem('planner_session');
+            showPage('auth');
+        }
+        
+        function updateUserUI() {
+            if (AppState.currentUser) {
+                const { name, email } = AppState.currentUser;
+                document.getElementById('userName').textContent = name;
+                document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+                document.getElementById('profileName').textContent = name;
+                document.getElementById('profileEmail').textContent = email;
+                document.getElementById('profileAvatar').textContent = name.charAt(0).toUpperCase();
+                document.getElementById('editName').value = name;
+                document.getElementById('editEmail').value = email;
+            }
+        }
+        
+        // Data Management Functions
+        function loadUserData() {
+            const userId = AppState.currentUser?.id;
+            if (!userId) return;
+            
+            // Load user-specific data
+            AppState.prompts = JSON.parse(localStorage.getItem(`planner_prompts_${userId}`) || '[]');
+            AppState.templates = JSON.parse(localStorage.getItem(`planner_templates_${userId}`) || '[]');
+            AppState.variables = JSON.parse(localStorage.getItem(`planner_variables_${userId}`) || '[]');
+            
+            updateDashboard();
+            updateLibrary();
+            updateTemplates();
+            updateVariables();
+            updateTestPromptSelect();
+        }
+        
+        function saveUserData() {
+            const userId = AppState.currentUser?.id;
+            if (!userId) return;
+            
+            localStorage.setItem(`planner_prompts_${userId}`, JSON.stringify(AppState.prompts));
+            localStorage.setItem(`planner_templates_${userId}`, JSON.stringify(AppState.templates));
+            localStorage.setItem(`planner_variables_${userId}`, JSON.stringify(AppState.variables));
+        }
+        
+        function exportUserData() {
+            const userId = AppState.currentUser?.id;
+            if (!userId) return;
+            
+            const exportData = {
+                prompts: AppState.prompts,
+                templates: AppState.templates,
+                variables: AppState.variables,
+                exportedAt: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `planner-backup-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showToast('Data exported successfully!', 'success');
+        }
+        
+        function importUserData(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate data structure
+                    if (!data.prompts || !data.templates || !data.variables) {
+                        throw new Error('Invalid data format');
+                    }
+                    
+                    // Merge with existing data
+                    AppState.prompts = [...AppState.prompts, ...data.prompts];
+                    AppState.templates = [...AppState.templates, ...data.templates];
+                    AppState.variables = [...AppState.variables, ...data.variables];
+                    
+                    saveUserData();
+                    loadUserData();
+                    
+                    showToast('Data imported successfully!', 'success');
+                } catch (error) {
+                    showToast('Error importing data: Invalid file format', 'danger');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        // Prompt Management Functions
+        function createPrompt(promptData) {
+            const newPrompt = {
+                id: Date.now().toString(),
+                title: promptData.title,
+                content: promptData.content,
+                category: promptData.category,
+                tags: promptData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                variables: promptData.variables || [],
+                favorite: promptData.favorite || false,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                tokenCount: estimateTokens(promptData.content),
+                userId: AppState.currentUser.id
+            };
+            
+            AppState.prompts.unshift(newPrompt);
+            saveUserData();
+            return newPrompt;
+        }
+        
+        function updatePrompt(id, promptData) {
+            const index = AppState.prompts.findIndex(p => p.id === id);
+            if (index === -1) return null;
+            
+            AppState.prompts[index] = {
+                ...AppState.prompts[index],
+                ...promptData,
+                updatedAt: new Date().toISOString(),
+                tokenCount: estimateTokens(promptData.content || AppState.prompts[index].content)
+            };
+            
+            saveUserData();
+            return AppState.prompts[index];
+        }
+        
+        function deletePrompt(id) {
+            AppState.prompts = AppState.prompts.filter(p => p.id !== id);
+            saveUserData();
+        }
+        
+        function getPromptById(id) {
+            return AppState.prompts.find(p => p.id === id);
+        }
+        
+        // Template Management Functions
+        function createTemplate(promptId) {
+            const prompt = getPromptById(promptId);
+            if (!prompt) return null;
+            
+            const newTemplate = {
+                id: Date.now().toString(),
+                name: prompt.title,
+                promptId: prompt.id,
+                category: prompt.category,
+                createdAt: new Date().toISOString()
+            };
+            
+            AppState.templates.push(newTemplate);
+            saveUserData();
+            return newTemplate;
+        }
+        
+        // Variable Management Functions
+        function createVariable(variableData) {
+            const newVariable = {
+                id: Date.now().toString(),
+                name: variableData.name,
+                description: variableData.description,
+                values: variableData.values.split('\n').map(v => v.trim()).filter(v => v),
+                createdAt: new Date().toISOString(),
+                userId: AppState.currentUser.id
+            };
+            
+            AppState.variables.push(newVariable);
+            saveUserData();
+            return newVariable;
+        }
+        
+        // UI Helper Functions
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).style.display = 'block';
+            AppState.currentPage = pageId;
+            
+            // Update sidebar active link
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${pageId}`) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Update navbar brand link
+            const navbarBrand = document.querySelector('.navbar-brand');
+            if (pageId === 'auth') {
+                navbarBrand.href = '#auth';
+            } else {
+                navbarBrand.href = '#dashboard';
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toastId = 'toast-' + Date.now();
+            
+            const toastHTML = `
+                <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            toast.show();
+            
+            // Remove toast after it's hidden
+            toastElement.addEventListener('hidden.bs.toast', function() {
+                toastElement.remove();
+            });
+        }
+        
+        function showLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            if (show) {
+                spinner.classList.add('active');
+            } else {
+                spinner.classList.remove('active');
+            }
+        }
+        
+        function updateDashboard() {
+            // Update stats
+            document.getElementById('totalPrompts').textContent = AppState.prompts.length;
+            document.getElementById('totalTemplates').textContent = AppState.templates.length;
+            document.getElementById('totalVariables').textContent = AppState.variables.length;
+            document.getElementById('recentPromptsCount').textContent = AppState.prompts.length;
+            document.getElementById('favoritesCount').textContent = AppState.prompts.filter(p => p.favorite).length;
+            document.getElementById('dashboardTemplatesCount').textContent = AppState.templates.length;
+            
+            // Calculate token count
+            const totalTokens = AppState.prompts.reduce((sum, prompt) => sum + (prompt.tokenCount || 0), 0);
+            document.getElementById('tokensUsed').textContent = totalTokens.toLocaleString();
+            
+            // Show recent prompts
+            const recentPromptsList = document.getElementById('recentPromptsList');
+            recentPromptsList.innerHTML = '';
+            
+            const recentPrompts = AppState.prompts.slice(0, 6);
+            recentPrompts.forEach(prompt => {
+                const promptCard = createPromptCard(prompt);
+                recentPromptsList.appendChild(promptCard);
+            });
+            
+            // Update category stats
+            const categoryStats = document.getElementById('categoryStats');
+            categoryStats.innerHTML = '';
+            
+            AppState.categories.forEach(category => {
+                const count = AppState.prompts.filter(p => p.category === category).length;
+                if (count > 0) {
+                    const categoryHTML = `
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+                            <span class="badge bg-primary">${count}</span>
+                        </div>
+                    `;
+                    categoryStats.insertAdjacentHTML('beforeend', categoryHTML);
+                }
+            });
+        }
+        
+        function updateLibrary() {
+            const promptsGrid = document.getElementById('promptsGrid');
+            promptsGrid.innerHTML = '';
+            
+            AppState.prompts.forEach(prompt => {
+                const promptCard = createPromptCard(prompt);
+                promptsGrid.appendChild(promptCard);
+            });
+        }
+        
+        function createPromptCard(prompt) {
+            const card = document.createElement('div');
+            card.className = 'card prompt-card';
+            card.dataset.id = prompt.id;
+            
+            const categoryClass = {
+                marketing: 'bg-primary',
+                creative: 'bg-success',
+                image: 'bg-warning',
+                code: 'bg-info',
+                video: 'bg-danger',
+                social: 'bg-secondary',
+                other: 'bg-dark'
+            }[prompt.category] || 'bg-dark';
+            
+            card.innerHTML = `
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title">${prompt.title}</h5>
+                        <div>
+                            ${prompt.favorite ? '<i class="fas fa-star text-warning"></i>' : ''}
+                        </div>
+                    </div>
+                    <p class="card-text small text-truncate">${prompt.content.substring(0, 100)}...</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="badge ${categoryClass}">${prompt.category}</span>
+                        <div class="d-flex">
+                            <button class="btn btn-sm btn-outline-primary me-1 edit-prompt-btn">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary me-1 copy-prompt-btn">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-prompt-btn">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        ${prompt.tags.map(tag => `<span class="badge bg-light text-dark me-1">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        function updateTemplates() {
+            const savedTemplatesList = document.getElementById('savedTemplatesList');
+            savedTemplatesList.innerHTML = '';
+            
+            AppState.templates.forEach(template => {
+                const prompt = getPromptById(template.promptId);
+                if (prompt) {
+                    const templateCard = document.createElement('div');
+                    templateCard.className = 'card';
+                    
+                    templateCard.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="card-title">${template.name}</h5>
+                            <p class="card-text small">Based on: ${prompt.title}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">${template.category}</span>
+                                <button class="btn btn-sm btn-outline-primary use-template-btn" data-id="${template.id}">
+                                    Use Template
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    savedTemplatesList.appendChild(templateCard);
+                }
+            });
+        }
+        
+        function updateVariables() {
+            const variablesList = document.getElementById('variablesList');
+            variablesList.innerHTML = '';
+            
+            if (AppState.variables.length === 0) {
+                variablesList.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Variables allow you to create reusable templates. Create a variable set to use across multiple prompts.
+                    </div>
+                `;
+                return;
+            }
+            
+            AppState.variables.forEach(variable => {
+                const variableItem = document.createElement('div');
+                variableItem.className = 'card mb-3';
+                
+                variableItem.innerHTML = `
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="card-title">{{${variable.name}}}</h5>
+                                <p class="card-text small">${variable.description}</p>
+                            </div>
+                            <span class="badge bg-primary">${variable.values.length} values</span>
+                        </div>
+                        <div class="mt-2">
+                            <h6 class="small">Values:</h6>
+                            <div class="d-flex flex-wrap gap-1">
+                                ${variable.values.map(value => `<span class="badge bg-light text-dark">${value}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-end">
+                            <button class="btn btn-sm btn-outline-primary me-2 edit-variable-btn" data-id="${variable.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-variable-btn" data-id="${variable.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                variablesList.appendChild(variableItem);
+            });
+        }
+        
+        function updateTestPromptSelect() {
+            const testPromptSelect = document.getElementById('testPromptSelect');
+            testPromptSelect.innerHTML = '<option value="">Select a prompt to test</option>';
+            
+            AppState.prompts.forEach(prompt => {
+                const option = document.createElement('option');
+                option.value = prompt.id;
+                option.textContent = prompt.title;
+                testPromptSelect.appendChild(option);
+            });
+        }
+        
+        function estimateTokens(text) {
+            // Simple estimation: ~4 characters per token for English text
+            return Math.ceil(text.length / 4);
+        }
+        
+        function extractVariablesFromText(text) {
+            const variableRegex = /\{\{([^}]+)\}\}/g;
+            const variables = [];
+            let match;
+            
+            while ((match = variableRegex.exec(text)) !== null) {
+                variables.push(match[1].trim());
+            }
+            
+            return [...new Set(variables)]; // Remove duplicates
+        }
+        
+        function renderPromptWithVariables(promptText, variableValues = {}) {
+            let result = promptText;
+            
+            for (const [variable, value] of Object.entries(variableValues)) {
+                const regex = new RegExp(`\\{\\{${variable}\\}\\}`, 'g');
+                result = result.replace(regex, value || `{{${variable}}}`);
+            }
+            
+            return result;
+        }
+        
+        function highlightVariables(text) {
+            const variableRegex = /\{\{([^}]+)\}\}/g;
+            return text.replace(variableRegex, '<span class="variable-highlight">{{$1}}</span>');
+        }
+        
+        // Theme Management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('planner_theme');
+            if (savedTheme) {
+                AppState.currentTheme = savedTheme;
+            }
+            
+            applyTheme(AppState.currentTheme);
+            updateThemeIcon();
+        }
+        
+        function applyTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            AppState.currentTheme = theme;
+            localStorage.setItem('planner_theme', theme);
+        }
+        
+        function toggleTheme() {
+            const newTheme = AppState.currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+            updateThemeIcon();
+            
+            // Animate theme transition
+            anime({
+                targets: 'body',
+                easing: 'easeOutQuad',
+                duration: 300
+            });
+        }
+        
+        function updateThemeIcon() {
+            const themeIcon = document.querySelector('#themeToggle i');
+            if (AppState.currentTheme === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+            }
+        }
+        
+        // Initialize Editor
+        function initEditor(promptId = null) {
+            const editor = document.getElementById('promptEditor');
+            const titleInput = document.getElementById('promptTitle');
+            const categorySelect = document.getElementById('promptCategory');
+            const tagsInput = document.getElementById('promptTags');
+            const favoriteCheckbox = document.getElementById('promptFavorite');
+            
+            if (promptId) {
+                // Edit existing prompt
+                const prompt = getPromptById(promptId);
+                if (prompt) {
+                    AppState.editingPrompt = prompt;
+                    document.getElementById('editorTitle').textContent = 'Edit Prompt';
+                    titleInput.value = prompt.title;
+                    editor.innerHTML = highlightVariables(prompt.content);
+                    categorySelect.value = prompt.category;
+                    tagsInput.value = prompt.tags.join(', ');
+                    favoriteCheckbox.checked = prompt.favorite;
+                    
+                    // Extract and display variables
+                    const variables = extractVariablesFromText(prompt.content);
+                    updateVariableInputs(variables);
+                }
+            } else {
+                // New prompt
+                AppState.editingPrompt = null;
+                document.getElementById('editorTitle').textContent = 'New Prompt';
+                titleInput.value = '';
+                editor.innerHTML = '';
+                categorySelect.value = 'marketing';
+                tagsInput.value = '';
+                favoriteCheckbox.checked = false;
+                document.getElementById('variablesContainer').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Add variables using {{variable_name}} syntax in the editor above.
+                    </div>
+                `;
+            }
+            
+            updatePreview();
+            showPage('editor');
+            
+            // Focus editor
+            setTimeout(() => {
+                editor.focus();
+            }, 100);
+        }
+        
+        function updateVariableInputs(variables) {
+            const container = document.getElementById('variablesContainer');
+            
+            if (variables.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Add variables using {{variable_name}} syntax in the editor above.
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            variables.forEach(variable => {
+                html += `
+                    <div class="variable-input">
+                        <label class="form-label small">${variable}</label>
+                        <input type="text" class="form-control form-control-sm variable-value" data-variable="${variable}" placeholder="Enter value for ${variable}">
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function updatePreview() {
+            const editor = document.getElementById('promptEditor');
+            const preview = document.getElementById('promptPreview');
+            
+            // Get variable values
+            const variableInputs = document.querySelectorAll('.variable-value');
+            const variableValues = {};
+            
+            variableInputs.forEach(input => {
+                variableValues[input.dataset.variable] = input.value;
+            });
+            
+            // Render prompt with variables
+            const promptText = editor.textContent || editor.innerText;
+            const renderedPrompt = renderPromptWithVariables(promptText, variableValues);
+            
+            // Update preview with syntax highlighting
+            preview.innerHTML = `<pre><code class="language-markdown">${renderedPrompt}</code></pre>`;
+            
+            // Apply syntax highlighting
+            if (window.hljs) {
+                hljs.highlightAll();
+            }
+            
+            // Update character and token counts
+            const charCount = promptText.length;
+            const tokenCount = estimateTokens(promptText);
+            
+            document.getElementById('charCount').textContent = charCount;
+            document.getElementById('tokenCount').textContent = tokenCount;
+        }
+        
+        // Event Listeners
+        function initEventListeners() {
+            // Theme toggle
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+                document.querySelector('.sidebar-overlay').classList.toggle('show');
+            });
+            
+            // Close sidebar when clicking overlay
+            document.querySelector('.sidebar-overlay').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+                this.classList.remove('show');
+            });
+            
+            // Sidebar navigation
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('href').substring(1);
+                    
+                    // Close sidebar on mobile
+                    if (window.innerWidth < 768) {
+                        document.getElementById('sidebar').classList.remove('show');
+                        document.querySelector('.sidebar-overlay').classList.remove('show');
+                    }
+                    
+                    if (AppState.isLoggedIn) {
+                        showPage(pageId);
+                    } else if (pageId === 'auth') {
+                        showPage('auth');
+                    }
+                });
+            });
+            
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                const remember = document.getElementById('rememberMe').checked;
+                
+                showLoading(true);
+                
+                setTimeout(() => {
+                    const result = loginUser(email, password, remember);
+                    
+                    if (result.success) {
+                        showToast('Login successful!', 'success');
+                    } else {
+                        showToast(result.message, 'danger');
+                    }
+                    
+                    showLoading(false);
+                }, 1000);
+            });
+            
+            // Register form
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('registerName').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('registerConfirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    showToast('Passwords do not match', 'danger');
+                    return;
+                }
+                
+                showLoading(true);
+                
+                setTimeout(() => {
+                    const result = registerUser(name, email, password);
+                    
+                    if (result.success) {
+                        showToast('Registration successful!', 'success');
+                    } else {
+                        showToast(result.message, 'danger');
+                    }
+                    
+                    showLoading(false);
+                }, 1000);
+            });
+            
+            // Forgot password
+            document.getElementById('forgotPasswordBtn').addEventListener('click', function() {
+                showToast('Please contact support to reset your password.', 'info');
+            });
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+                showToast('Logged out successfully', 'info');
+            });
+            
+            // New prompt button
+            document.getElementById('newPromptBtn').addEventListener('click', function() {
+                initEditor();
+            });
+            
+            // Quick actions
+            document.getElementById('quickNewPrompt').addEventListener('click', function() {
+                initEditor();
+            });
+            
+            document.getElementById('quickTestPrompt').addEventListener('click', function() {
+                showPage('testing');
+            });
+            
+            document.getElementById('quickVariables').addEventListener('click', function() {
+                showPage('variables');
+            });
+            
+            document.getElementById('quickTemplates').addEventListener('click', function() {
+                showPage('templates');
+            });
+            
+            // Cancel edit
+            document.getElementById('cancelEditBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+                    showPage('dashboard');
+                }
+            });
+            
+            // Save prompt
+            document.getElementById('savePromptBtn').addEventListener('click', function() {
+                const title = document.getElementById('promptTitle').value.trim();
+                const content = document.getElementById('promptEditor').textContent || document.getElementById('promptEditor').innerText;
+                const category = document.getElementById('promptCategory').value;
+                const tags = document.getElementById('promptTags').value;
+                const favorite = document.getElementById('promptFavorite').checked;
+                
+                if (!title || !content) {
+                    showToast('Please fill in all required fields', 'warning');
+                    return;
+                }
+                
+                showLoading(true);
+                
+                setTimeout(() => {
+                    const promptData = {
+                        title,
+                        content,
+                        category,
+                        tags,
+                        favorite,
+                        variables: extractVariablesFromText(content)
+                    };
+                    
+                    if (AppState.editingPrompt) {
+                        updatePrompt(AppState.editingPrompt.id, promptData);
+                        showToast('Prompt updated successfully!', 'success');
+                    } else {
+                        createPrompt(promptData);
+                        showToast('Prompt saved successfully!', 'success');
+                    }
+                    
+                    showLoading(false);
+                    showPage('dashboard');
+                }, 500);
+            });
+            
+            // Add variable button
+            document.getElementById('addVariableBtn').addEventListener('click', function() {
+                const variableModal = new bootstrap.Modal(document.getElementById('variableModal'));
+                variableModal.show();
+            });
+            
+            // Save variable
+            document.getElementById('saveVariableBtn').addEventListener('click', function() {
+                const name = document.getElementById('variableName').value.trim();
+                const description = document.getElementById('variableDescription').value.trim();
+                const values = document.getElementById('variableValues').value.trim();
+                
+                if (!name) {
+                    showToast('Variable name is required', 'warning');
+                    return;
+                }
+                
+                const variableData = { name, description, values };
+                createVariable(variableData);
+                
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('variableModal')).hide();
+                
+                // Reset form
+                document.getElementById('variableName').value = '';
+                document.getElementById('variableDescription').value = '';
+                document.getElementById('variableValues').value = '';
+                
+                showToast('Variable created successfully!', 'success');
+            });
+            
+            // Preview prompt
+            document.getElementById('previewPromptBtn').addEventListener('click', updatePreview);
+            
+            // Editor input events
+            const editor = document.getElementById('promptEditor');
+            let debounceTimer;
+            
+            editor.addEventListener('input', function() {
+                // Highlight variables in real-time
+                const text = this.textContent || this.innerText;
+                const highlighted = highlightVariables(text);
+                
+                // Avoid infinite loop by checking if content changed
+                if (this.innerHTML !== highlighted) {
+                    this.innerHTML = highlighted;
+                    
+                    // Move cursor to end
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(this);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+                
+                // Extract variables
+                const variables = extractVariablesFromText(text);
+                updateVariableInputs(variables);
+                
+                // Update preview with debounce
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(updatePreview, 500);
+            });
+            
+            // Variable inputs change
+            document.addEventListener('input', function(e) {
+                if (e.target.classList.contains('variable-value')) {
+                    updatePreview();
+                }
+            });
+            
+            // Export data
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                const exportModal = new bootstrap.Modal(document.getElementById('exportModal'));
+                exportModal.show();
+            });
+            
+            // Confirm export
+            document.getElementById('confirmExportBtn').addEventListener('click', function() {
+                exportUserData();
+                bootstrap.Modal.getInstance(document.getElementById('exportModal')).hide();
+            });
+            
+            // Import data
+            document.getElementById('importBtn').addEventListener('click', function() {
+                // Create file input
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = '.json';
+                
+                fileInput.addEventListener('change', function(e) {
+                    if (e.target.files.length > 0) {
+                        importUserData(e.target.files[0]);
+                    }
+                });
+                
+                fileInput.click();
+            });
+            
+            // Clear data
+            document.getElementById('clearDataBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                    if (confirm('Would you like to export a backup first?')) {
+                        exportUserData();
+                    }
+                    
+                    const userId = AppState.currentUser?.id;
+                    if (userId) {
+                        localStorage.removeItem(`planner_prompts_${userId}`);
+                        localStorage.removeItem(`planner_templates_${userId}`);
+                        localStorage.removeItem(`planner_variables_${userId}`);
+                    }
+                    
+                    AppState.prompts = [];
+                    AppState.templates = [];
+                    AppState.variables = [];
+                    
+                    updateDashboard();
+                    updateLibrary();
+                    updateTemplates();
+                    updateVariables();
+                    
+                    showToast('All data cleared', 'info');
+                }
+            });
+            
+            // Category filters
+            document.querySelectorAll('.category-filter').forEach(button => {
+                button.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    
+                    // Update active state
+                    document.querySelectorAll('.category-filter').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Filter prompts
+                    const promptCards = document.querySelectorAll('.prompt-card');
+                    
+                    promptCards.forEach(card => {
+                        if (category === 'all' || card.dataset.category === category) {
+                            card.style.display = 'block';
+                            
+                            // Animate appearance
+                            anime({
+                                targets: card,
+                                opacity: [0, 1],
+                                translateY: [10, 0],
+                                duration: 300,
+                                easing: 'easeOutQuad'
+                            });
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Template cards
+            document.addEventListener('click', function(e) {
+                // Use template
+                if (e.target.closest('.use-template-btn')) {
+                    const templateId = e.target.closest('.use-template-btn').dataset.id;
+                    const template = AppState.templates.find(t => t.id === templateId);
+                    
+                    if (template) {
+                        const prompt = getPromptById(template.promptId);
+                        if (prompt) {
+                            initEditor();
+                            
+                            // Fill with template data
+                            document.getElementById('promptTitle').value = `Copy of ${prompt.title}`;
+                            document.getElementById('promptEditor').innerHTML = highlightVariables(prompt.content);
+                            document.getElementById('promptCategory').value = prompt.category;
+                            document.getElementById('promptTags').value = prompt.tags.join(', ');
+                            
+                            showToast('Template loaded! Customize as needed.', 'success');
+                        }
+                    }
+                }
+                
+                // Edit prompt from library
+                if (e.target.closest('.edit-prompt-btn')) {
+                    const promptId = e.target.closest('.card').dataset.id;
+                    initEditor(promptId);
+                }
+                
+                // Copy prompt
+                if (e.target.closest('.copy-prompt-btn')) {
+                    const promptId = e.target.closest('.card').dataset.id;
+                    const prompt = getPromptById(promptId);
+                    
+                    if (prompt) {
+                        navigator.clipboard.writeText(prompt.content)
+                            .then(() => showToast('Prompt copied to clipboard!', 'success'))
+                            .catch(() => showToast('Failed to copy prompt', 'danger'));
+                    }
+                }
+                
+                // Delete prompt
+                if (e.target.closest('.delete-prompt-btn')) {
+                    const promptId = e.target.closest('.card').dataset.id;
+                    
+                    if (confirm('Are you sure you want to delete this prompt?')) {
+                        deletePrompt(promptId);
+                        updateDashboard();
+                        updateLibrary();
+                        showToast('Prompt deleted', 'info');
+                    }
+                }
+            });
+            
+            // Profile form
+            document.getElementById('profileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('editName').value.trim();
+                const email = document.getElementById('editEmail').value.trim();
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!name || !email) {
+                    showToast('Name and email are required', 'warning');
+                    return;
+                }
+                
+                if (newPassword && newPassword !== confirmPassword) {
+                    showToast('New passwords do not match', 'danger');
+                    return;
+                }
+                
+                // Verify current password
+                const hashedCurrentPassword = simpleHash(currentPassword);
+                if (hashedCurrentPassword !== AppState.currentUser.password) {
+                    showToast('Current password is incorrect', 'danger');
+                    return;
+                }
+                
+                // Update user
+                const users = JSON.parse(localStorage.getItem('planner_users') || '[]');
+                const userIndex = users.findIndex(u => u.id === AppState.currentUser.id);
+                
+                if (userIndex !== -1) {
+                    users[userIndex].name = name;
+                    users[userIndex].email = email;
+                    
+                    if (newPassword) {
+                        users[userIndex].password = simpleHash(newPassword);
+                    }
+                    
+                    localStorage.setItem('planner_users', JSON.stringify(users));
+                    AppState.currentUser = users[userIndex];
+                    
+                    updateUserUI();
+                    showToast('Profile updated successfully!', 'success');
+                    
+                    // Clear password fields
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                }
+            });
+            
+            // Cancel profile edit
+            document.getElementById('cancelProfileBtn').addEventListener('click', function() {
+                showPage('dashboard');
+            });
+            
+            // Test prompt
+            document.getElementById('testPromptBtn').addEventListener('click', function() {
+                const promptId = document.getElementById('testPromptSelect').value;
+                const apiKey = document.getElementById('apiKey').value;
+                
+                if (!promptId) {
+                    showToast('Please select a prompt to test', 'warning');
+                    return;
+                }
+                
+                if (!apiKey) {
+                    showToast('Please enter your API key', 'warning');
+                    return;
+                }
+                
+                const prompt = getPromptById(promptId);
+                if (!prompt) return;
+                
+                // Simulate API call (in a real app, this would call an actual AI API)
+                showLoading(true);
+                
+                setTimeout(() => {
+                    showLoading(false);
+                    
+                    const testResults = document.getElementById('testResults');
+                    testResults.innerHTML = `
+                        <div class="alert alert-success">
+                            <h5>Test Result (Simulated)</h5>
+                            <p>Prompt tested successfully with ${prompt.title}</p>
+                            <hr>
+                            <p><strong>Prompt:</strong> ${prompt.content.substring(0, 200)}...</p>
+                            <p><strong>Tokens:</strong> ${prompt.tokenCount}</p>
+                            <p><strong>Temperature:</strong> ${document.getElementById('temperature').value}</p>
+                            <p><strong>AI Service:</strong> ${document.getElementById('aiServiceSelect').value}</p>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h6>Generated Output (Example)</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>This is a simulated response based on your prompt. In a real implementation, this would connect to an actual AI API like OpenAI, Anthropic, or Google AI.</p>
+                                <p>To enable real AI testing, you would need to:</p>
+                                <ol>
+                                    <li>Obtain an API key from your preferred AI provider</li>
+                                    <li>Implement the API call in the application code</li>
+                                    <li>Handle the response and display it here</li>
+                                </ol>
+                            </div>
+                        </div>
+                    `;
+                    
+                    showToast('Prompt test completed (simulated)', 'success');
+                }, 2000);
+            });
+            
+            // Temperature slider
+            document.getElementById('temperature').addEventListener('input', function() {
+                document.getElementById('tempValue').textContent = this.value;
+            });
+            
+            // Initialize template cards
+            document.querySelectorAll('.prompt-card[data-template]').forEach(card => {
+                card.addEventListener('click', function() {
+                    const template = this.dataset.template;
+                    
+                    initEditor();
+                    
+                    // Load template content
+                    const templates = {
+                        marketing: {
+                            title: 'Marketing Copy Generator',
+                            content: 'Write compelling marketing copy for a {{product}} targeted at {{audience}}. The tone should be {{tone}} and highlight these key benefits: {{benefits}}. Include a call to action.',
+                            category: 'marketing',
+                            tags: 'marketing, copy, sales'
+                        },
+                        creative: {
+                            title: 'Creative Story Generator',
+                            content: 'Write a short creative story about {{subject}} in the {{genre}} genre. The main character is {{character}} who faces the challenge of {{challenge}}. Include elements of {{elements}}.',
+                            category: 'creative',
+                            tags: 'writing, story, creative'
+                        },
+                        image: {
+                            title: 'AI Image Generation Prompt',
+                            content: '{{subject}}, {{style}} style, {{lighting}} lighting, {{composition}} composition, {{details}}. High quality, detailed, 4K.',
+                            category: 'image',
+                            tags: 'image, ai, art'
+                        },
+                        code: {
+                            title: 'Code Assistant',
+                            content: 'Write a {{language}} function that {{task}}. The function should be named {{function_name}} and accept these parameters: {{parameters}}. Include comments and error handling.',
+                            category: 'code',
+                            tags: 'code, programming, development'
+                        }
+                    };
+                    
+                    if (templates[template]) {
+                        const t = templates[template];
+                        document.getElementById('promptTitle').value = t.title;
+                        document.getElementById('promptEditor').innerHTML = highlightVariables(t.content);
+                        document.getElementById('promptCategory').value = t.category;
+                        document.getElementById('promptTags').value = t.tags;
+                        
+                        showToast('Template loaded! Customize as needed.', 'success');
+                    }
+                });
+            });
+        }
+        
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(
+                    function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    },
+                    function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    }
+                );
+            });
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            initEventListeners();
+            initializeAuth();
+            
+            // Auto-save functionality
+            let autoSaveTimer;
+            document.addEventListener('input', function(e) {
+                if (AppState.currentPage === 'editor' && AppState.isLoggedIn) {
+                    clearTimeout(autoSaveTimer);
+                    autoSaveTimer = setTimeout(() => {
+                        // Auto-save draft to localStorage
+                        const title = document.getElementById('promptTitle').value.trim();
+                        const content = document.getElementById('promptEditor').textContent || document.getElementById('promptEditor').innerText;
+                        
+                        if (title || content) {
+                            const draft = {
+                                title,
+                                content,
+                                category: document.getElementById('promptCategory').value,
+                                tags: document.getElementById('promptTags').value,
+                                favorite: document.getElementById('promptFavorite').checked,
+                                savedAt: new Date().toISOString()
+                            };
+                            
+                            localStorage.setItem('planner_draft', JSON.stringify(draft));
+                        }
+                    }, 2000); // Debounce for 2 seconds
+                }
+            });
+            
+            // Load draft if exists
+            const draft = localStorage.getItem('planner_draft');
+            if (draft) {
+                try {
+                    const draftData = JSON.parse(draft);
+                    if (draftData.title || draftData.content) {
+                        // Offer to restore draft when creating new prompt
+                        document.getElementById('newPromptBtn').addEventListener('click', function restoreDraftCheck() {
+                            if (confirm('You have an unsaved draft. Would you like to restore it?')) {
+                                initEditor();
+                                
+                                document.getElementById('promptTitle').value = draftData.title;
+                                document.getElementById('promptEditor').innerHTML = highlightVariables(draftData.content);
+                                document.getElementById('promptCategory').value = draftData.category || 'marketing';
+                                document.getElementById('promptTags').value = draftData.tags || '';
+                                document.getElementById('promptFavorite').checked = draftData.favorite || false;
+                                
+                                localStorage.removeItem('planner_draft');
+                            }
+                            
+                            // Remove this event listener after first use
+                            document.getElementById('newPromptBtn').removeEventListener('click', restoreDraftCheck);
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error parsing draft:', e);
+                }
+            }
+            
+            // Initialize with some sample data if new user
+            setTimeout(() => {
+                if (AppState.isLoggedIn && AppState.prompts.length === 0) {
+                    // Create sample prompts for new users
+                    const samplePrompts = [
+                        {
+                            title: 'Social Media Post Generator',
+                            content: 'Create a {{platform}} post about {{topic}}. The tone should be {{tone}} and include a call to action to {{action}}. Use relevant hashtags.',
+                            category: 'social',
+                            tags: 'social media, marketing, content',
+                            favorite: true
+                        },
+                        {
+                            title: 'Blog Post Outline',
+                            content: 'Create an outline for a blog post about {{topic}} for {{audience}}. Include an introduction, {{number}} main points, and a conclusion. Focus on {{focus}}.',
+                            category: 'creative',
+                            tags: 'blog, writing, content',
+                            favorite: false
+                        },
+                        {
+                            title: 'Product Description',
+                            content: 'Write a product description for {{product}}. Highlight these features: {{features}}. Target audience is {{audience}}. Include benefits and specifications.',
+                            category: 'marketing',
+                            tags: 'ecommerce, product, sales',
+                            favorite: true
+                        }
+                    ];
+                    
+                    samplePrompts.forEach(prompt => {
+                        createPrompt(prompt);
+                    });
+                    
+                    showToast('Welcome to Planner! Sample prompts have been added to your library.', 'info');
+                }
+            }, 1000);
+        });
+    </script>
+    
+    <!-- Service Worker (inlined) -->
+    <script id="service-worker">
+        // This would normally be in a separate file, but for single-file PWA we're including it here
+        if ('serviceWorker' in navigator) {
+            // Create a blob from the service worker code
+            const swCode = `
+                self.addEventListener('install', function(event) {
+                    event.waitUntil(
+                        caches.open('planner-v1').then(function(cache) {
+                            return cache.addAll([
+                                '/',
+                                '/index.html',
+                                '/manifest.json'
+                            ]);
+                        })
+                    );
+                });
+                
+                self.addEventListener('fetch', function(event) {
+                    event.respondWith(
+                        caches.match(event.request).then(function(response) {
+                            return response || fetch(event.request);
+                        })
+                    );
+                });
+            `;
+            
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swURL = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swURL)
+                .then(registration => console.log('Service Worker registered'))
+                .catch(error => console.log('Service Worker registration failed:', error));
+        }
+    </script>
+    
+    <!-- Manifest (inlined) -->
+    <script type="application/json" id="manifest-data">
+        {
+            "name": "Planner - AI Prompt Manager",
+            "short_name": "Planner",
+            "description": "AI Prompt Management for Content Creators",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#4a6ee0",
+            "theme_color": "#4a6ee0",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgZmlsbD0iIzRhNmVlMCIvPjxwYXRoIGQ9Ik02NCAyNEM0Ny40MzIgMjQgMzQgMzcuNDMyIDM0IDU0djIwYzAgMTYuNTY4IDEzLjQzMiAzMCAzMCAzMHMzMC0xMy40MzIgMzAtMzBWNTRjMC0xNi41NjgtMTMuNDMyLTMwLTMwLTMwem0wIDQ0Yy03LjczMiAwLTE0LTYuMjY4LTE0LTE0czYuMjY4LTE0IDE0LTE0IDE0IDYuMjY4IDE0IDE0LTYuMjY4IDE0LTE0IDE0eiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik04NCA4NGMtNS41MjMgMC0xMCA0LjQ3Ny0xMCAxMHYxMGgtMjBWNjk0YzAgNS41MjMgNC40NzcgMTAgMTAgMTBoNDBjNS41MjMgMCAxMC00LjQ3NyAxMC0xMFY5NGMwLTUuNTIzLTQuNDc3LTEwLTEwLTEwek02NCAxMDhjLTcuNzMyIDAtMTQtNi4yNjgtMTQtMTRzNi4yNjgtMTQgMTQtMTQgMTQgNi4yNjggMTQgMTQtNi4yNjggMTQtMTQgMTR6IiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjgiLz48L3N2Zz4=",
+                    "sizes": "128x128",
+                    "type": "image/svg+xml"
+                }
+            ]
+        }
+    </script>
+    
+    <script>
+        // Create manifest link
+        const manifestData = JSON.parse(document.getElementById('manifest-data').textContent);
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = manifestURL;
+        document.head.appendChild(manifestLink);
+    </script>
+</body>
+</html>
